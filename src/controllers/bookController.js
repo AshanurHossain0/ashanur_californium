@@ -1,23 +1,14 @@
 const { count } = require("console")
 const BookModel = require("../models/bookModel")
 
-const createBook= async function (req, res) {
-    let data= req.body
-
-    let savedData= await BookModel.create(data)
-    res.send({msg: savedData})
+const createBook= function (req, res) {
+    
+    res.send({msg: "Ok,book is created"})
 }
 
 
-
-
-
-
-const getBooksData = async function (req, res) {
-    let allBooks = await BookModel.find({ authorName: "HO" })
-    console.log(allBooks)
-    if (allBooks.length > 0) res.send({ msg: allBooks, condition: true })
-    else res.send({ msg: "No books found", condition: false })
+const getBooksData =function (req, res) {
+    res.send({msg:"got all books"})
 }
 
 
@@ -74,6 +65,3 @@ const totalSalesPerAuthor = async function (req, res) {
 
 module.exports.createBook = createBook
 module.exports.getBooksData = getBooksData
-module.exports.updateBooks = updateBooks
-module.exports.deleteBooks = deleteBooks
-module.exports.totalSalesPerAuthor = totalSalesPerAuthor
