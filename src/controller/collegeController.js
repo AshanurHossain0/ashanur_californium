@@ -48,7 +48,7 @@ exports.interCreate=async function(req,res){
 
     if(!name.match(nameRegex)) return res.status(400).send({status:false,msg:"plz. give valid name"})
     if(!email.match(emailRegex)) return res.status(400).send({status:false,message:"email should be valid"})
-    if(!mobile.match(mobileRegex)) return res.status(400).send({status:false,msg:"mobile number invalid"})
+    if(!mobileRegex.test(mobile)) return res.status(400).send({status:false,msg:"mobile number invalid"})
     
     let emailCheck= await internsModel.findOne({email :email})
     if(emailCheck) return res.status(400).send({status :false , message : "email id already exist"})
@@ -69,10 +69,11 @@ exports.interCreate=async function(req,res){
 
 
 exports.getCollege=async (req,res)=>{
-    try{
+    try{     
    let data=req.query.collegeName
+   if(!data) return res.status(400).send({status:false,msg:"please provide collegeName"})
    const newData=await collegeModel.findOne({name:data,isDeleted :false})
-   if(!newData) return res.status(404).send({status:false,message:"you are not correct"})
+   if(!newData) return res.status(404).send({status:false,message:"college not found"})
    let findInterns=await internsModel.find({collegeId:newData._id.toString(),isDeleted : false}).select({collegeId:0 ,isDeleted :0,__v:0})
    if(findInterns.length == 0){ findInterns = "no intens "}
    let newObj={name:newData.name,fullName:newData.fullName,logoLink:newData.logoLink,interns:findInterns}
