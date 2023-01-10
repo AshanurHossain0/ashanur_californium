@@ -25,7 +25,7 @@ exports.collegeCreate=async function(req,res){
 
     if(!name.match(nameRegex)) return res.status(400).send({status:false,message:"invalid name"})
     if(!fullName.match(nameRegex)) return res.status(400).send({status:false,message:"full name invalid"})
-    
+
     let college=await collegeModel.findOne({name:name})
     if(college) return res.status(400).send({status:false,message:"this college name already exists"})
     let create=await collegeModel.create(data)
