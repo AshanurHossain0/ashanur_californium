@@ -32,11 +32,11 @@ exports.collegeCreate=async function(req,res){
     res.status(201).send({status:true,data:create})
 
 }catch(error){
-    res.status(500).send({error:error.message})
+    res.status(500).send({status:false,error:error.message})
 }}
 
 
-exports.interCreate=async function(req,res){
+exports.internCreate=async function(req,res){
    try{
     let data=req.body
     const {name,email,mobile,collegeName}=data

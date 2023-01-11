@@ -4,7 +4,7 @@ const router=express.Router()
 const collegeController=require("../controller/collegeController")
 
 router.post("/functionup/colleges",collegeController.collegeCreate)
-router.post("/functionup/interns",collegeController.interCreate)
+router.post("/functionup/interns",collegeController.internCreate)
 router.get("/functionup/collegeDetails",collegeController.getCollege)
 
 
