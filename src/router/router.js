@@ -2,7 +2,8 @@ const express = require("express")
 const router = express.Router()
 const urlController=require("../controllers/urlShortenController")
 
-router.post("/url/shorten",urlController.shortenUrl)
+
+router.post("/url/shorten",urlController.createShortUrl)
 
 
 
