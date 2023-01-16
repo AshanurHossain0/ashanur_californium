@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/19Beulah/URLshortnerproject/issues"
   },
-  "homepage": "https://github.com/19Beulah/URLshortnerproject#readme"
+  "homepage": "https://github.com/19Beulah/URLshortnerproject#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^6.8.3",
+    "node-url-shortener": "^2.0.3"
+  }
 }

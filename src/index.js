@@ -1,5 +1,6 @@
 const express=require("express")
 const app=express()
+const route=require("./router/router")
 const mongoose= require("mongoose")
 app.use(express.json());
 
