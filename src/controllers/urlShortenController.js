@@ -36,23 +36,27 @@ const createShortUrl = async function (req, res) {
 }
    const getUrl=async function (req,res){
      try{
-  //====>here we are using pathparam (/:urlCode)
- let urlCode = req.params.urlCode
-  //====> if urlCode not present it throughs the error
- if(!urlCode) return res.status(400).send({status:false , msg:"enter urlCode"})
 
- //====> here we find that urlCode in db
+ let urlCode = req.params.urlCode
+
+ if(!urlCode) return res.status(400).send({status:false , msg:"enter urlCode"})
+ 
  const getUrl=await urlModel.findOne({urlCode:urlCode})
- //====>if urlCode simply it gives the longUrl from the getUrl with status code 301 (redirected the http)
+
  if(getUrl){
+    l
     let longUrl=getUrl.longUrl
-  return res.status(302).redirect(longUrl)//'http://exmple.com'+
-  //====> if not urlCode present it throughs the error
+  
+    return res.status(302).redirect(longUrl)
+
  }else{
-   return res.status(404).send({status:false,msg:"Url not found"})
+   
+  return res.status(404).send({status:false,msg:"Url not found"})
  }
 }catch(err){
-   res.status(500).send({status:false,msg:err.message})
-  }
+   
+  res.status(500).send({status:false,msg:err.message})
+  
+}
 }
 module.exports = { createShortUrl,getUrl }
