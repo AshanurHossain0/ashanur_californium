@@ -6,6 +6,7 @@ const urlModel = require("../model/UrlModel");
 
 const baseUrl = "http:localhost:3000/"
 const createShortUrl = async function (req, res) {
+    
   try {
     const { longUrl } = req.body
     if (!longUrl) return res.status(400).send({ status: false, message: "please provide long url" })
@@ -39,7 +40,7 @@ const getUrl = async function (req, res) {
 
     let urlCode = req.params.urlCode
 
-    if (!urlCode) return res.status(400).send({ status: false, msg: "enter urlCode" })
+    if (!urlCode) return res.status(400).send({ status: false, message: "enter urlCode" })
 
     const getUrl = await urlModel.findOne({ urlCode: urlCode })
 
@@ -51,7 +52,8 @@ const getUrl = async function (req, res) {
 
     } else {
 
-      return res.status(404).send({ status: false, msg: "Url not found" })
+      return res.status(404).send({ status: false, message: "Url not found" })
+
     }
   } catch (err) {
 
