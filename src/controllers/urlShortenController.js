@@ -2,6 +2,7 @@ const shortid = require("shortid")
 const validUrl = require('url-validation')
 //=> model importing
 const urlModel = require("../model/UrlModel");
+const {GET_ASYNC,SET_ASYNC}=require('../router/cache')
 
 
 const baseUrl = "http:localhost:3000/"
@@ -35,30 +36,26 @@ const createShortUrl = async function (req, res) {
     res.status(500).send({ status: false, data: err.message })
   }
 }
-const getUrl = async function (req, res) {
-  try {
 
-    let urlCode = req.params.urlCode
+const getUrl = async function (req , res) {
+    try { 
+        let urlCodeRequest = req.params.urlCode.trim();
+        let cachedUrlCode = await GET_ASYNC(`${urlCodeRequest}`)
+                 
+        if(cachedUrlCode) {
+            cachedUrlCode = JSON.parse(cachedUrlCode);
+             res.status(302).redirect(cachedUrlCode.longUrl)
+        } else{
+            let findUrl = await urlModel.findOne({urlCode:urlCodeRequest})
+         if(!findUrl){return res.status(404).send({status:false, message: "No Url found"})}
+            await SET_ASYNC(`${req.params.urlCode}`, JSON.stringify(findUrl))
+             res.status(302).redirect(findUrl.longUrl );
+        }   
+    } catch (error) {
+        return res.status(500).send({msg:error.msg})
+        
+    }}; 
 
-    if (!urlCode) return res.status(400).send({ status: false, message: "enter urlCode" })
+module.exports={createShortUrl,getUrl}
 
-    const getUrl = await urlModel.findOne({ urlCode: urlCode })
 
-    if (getUrl) {
-
-      let longUrl = getUrl.longUrl
-
-      return res.status(302).redirect(longUrl)
-
-    } else {
-
-      return res.status(404).send({ status: false, message: "Url not found" })
-
-    }
-  } catch (err) {
-
-    res.status(500).send({ status: false, msg: err.message })
-
-  }
-}
-module.exports = { createShortUrl, getUrl }
