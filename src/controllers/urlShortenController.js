@@ -39,7 +39,7 @@ const createShortUrl = async function (req, res) {
     return res.status(201).send({ status: true, data: result })
 
   } catch (err) {
-    res.status(500).send({ status: false, data: err.message })
+    res.status(500).send({ status: false, message: err.message })
   }
 }
 const getUrl = async function (req, res) {
