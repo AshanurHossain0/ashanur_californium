@@ -1,9 +1,7 @@
 const shortid = require("shortid")
 const validUrl = require('url-validation')
-//=> model importing
 const urlModel = require("../model/UrlModel");
-const {GET_ASYNC,SET_ASYNC}=require('../router/cache')
-
+const caching=require("../cacheFolder/cache")
 
 const baseUrl = "http:localhost:3000/"
 const createShortUrl = async function (req, res) {
@@ -14,9 +12,15 @@ const createShortUrl = async function (req, res) {
 
     if (!validUrl(longUrl)) return res.status(400).send({ status: false, message: "please provide valid long url" })
 
+    let cachedUrlData = await caching.GET_ASYNC(`${longUrl}`)
+    if(cachedUrlData) return res.status(200).send(cachedUrlData)
+
     const findUrl = await urlModel.findOne({ longUrl: longUrl }).select({ urlCode: 1, shortUrl: 1, longUrl: 1, _id: 0 })
 
-    if (findUrl) return res.status(200).send({ status: true, data: findUrl })
+    if (findUrl){
+      await caching.SET_ASYNC(`${longUrl}`, JSON.stringify(findUrl), "EX" , 3600*12)
+      return res.status(200).send({ status: true, data: findUrl })
+    }
 
     let urlCode = shortid.generate();
 
@@ -30,32 +34,48 @@ const createShortUrl = async function (req, res) {
 
     const result = { longUrl: crData.longUrl, shortUrl: crData.shortUrl, urlCode: crData.urlCode }
 
+    await caching.SET_ASYNC(`${longUrl}`, JSON.stringify(result), "EX" , 3600*12)
+
     return res.status(201).send({ status: true, data: result })
 
   } catch (err) {
     res.status(500).send({ status: false, data: err.message })
   }
 }
+const getUrl = async function (req, res) {
+  try {
 
-const getUrl = async function (req , res) {
-    try { 
-        let urlCodeRequest = req.params.urlCode.trim();
-        let cachedUrlCode = await GET_ASYNC(`${urlCodeRequest}`)
-                 
-        if(cachedUrlCode) {
-            cachedUrlCode = JSON.parse(cachedUrlCode);
-             res.status(302).redirect(cachedUrlCode.longUrl)
-        } else{
-            let findUrl = await urlModel.findOne({urlCode:urlCodeRequest})
-         if(!findUrl){return res.status(404).send({status:false, message: "No Url found"})}
-            await SET_ASYNC(`${req.params.urlCode}`, JSON.stringify(findUrl))
-             res.status(302).redirect(findUrl.longUrl );
-        }   
-    } catch (error) {
-        return res.status(500).send({msg:error.msg})
-        
-    }}; 
+    let urlCode = req.params.urlCode.trim()
 
-module.exports={createShortUrl,getUrl}
+    if (!urlCode) return res.status(400).send({ status: false, message: "enter urlCode" })
+
+    let cahcedLongUrl = await caching.GET_ASYNC(`${urlCode}`)
+
+    if(cahcedLongUrl){
+      return res.status(302).redirect(cahcedLongUrl)
+    }
+
+    const getUrl = await urlModel.findOne({ urlCode: urlCode })
+
+    if (getUrl) {
+
+      let longUrl = getUrl.longUrl
+
+      await caching.SET_ASYNC(`${urlCode}`, longUrl , "EX", 3600*12)
+
+      return res.status(302).redirect(longUrl)
+
+    } else {
+
+      return res.status(404).send({ status: false, message: "Url not found" })
+
+    }
+  } catch (err) {
+
+    res.status(500).send({ status: false, msg: err.message })
+
+  }
+}
+module.exports = { createShortUrl, getUrl }
 
 
